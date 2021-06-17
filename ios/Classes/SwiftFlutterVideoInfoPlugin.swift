@@ -58,7 +58,7 @@ public class SwiftFlutterVideoInfoPlugin: NSObject, FlutterPlugin {
 
     var jsonObj = [String: Any]()
     jsonObj["path"] = path
-    jsonObj["title"] = asset.url.lastPathComponent
+    //jsonObj["title"] = asset.url.lastPathComponent
     jsonObj["mimetype"] = mimetype
     jsonObj["author"] = ""
     if let date = creationDate {
@@ -73,6 +73,14 @@ public class SwiftFlutterVideoInfoPlugin: NSObject, FlutterPlugin {
     jsonObj["duration"] = durationTime
     jsonObj["filesize"] = fileSize
     jsonObj["orientation"] = orientation
+
+    // Read title from metadata
+    let metadata = asset.commonMetadata
+    let titleID = AVMetadataIdentifier.commonIdentifierTitle
+    let titleItems = AVMetadataItem.metadataItems(from: metadata, filteredByIdentifier: titleID)
+
+    guard let item = titleItems.first else {return}
+    jsonObj["title"] = item.stringValue
 
     do {
       let jsonData = try JSONSerialization.data(withJSONObject: jsonObj)
